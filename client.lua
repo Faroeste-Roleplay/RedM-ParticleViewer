@@ -1,8 +1,3 @@
-local Tunnel = module("frp_lib", "lib/Tunnel")
-local Proxy = module("frp_lib", "lib/Proxy")
-
-API = Tunnel.getInterface("API")
-
 local ParticleViewer = {}
 ---@type number
 ParticleViewer.ParticleHandle = nil
@@ -166,20 +161,10 @@ RegisterNUICallback("SET_CURSOR_STATE", function(data, cb)
 end)
 
 RegisterCommand("pv_open", function()
-    print(" pv_open ", 1)
-    if not API.IsPlayerAceAllowedGroup(GetPlayerServerId(PlayerId()), "admin") then
-        return
-    end
-    print(" pv_open ", 2)
-
     ParticleViewer:Open()
 end)
 
 RegisterCommand("pv_close", function()
-    if not API.IsPlayerAceAllowedGroup(GetPlayerServerId(PlayerId()), "admin") then
-        return
-    end
-
     ParticleViewer:Close()
 end)
 
