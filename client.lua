@@ -1,3 +1,8 @@
+local Tunnel = module("frp_lib", "lib/Tunnel")
+local Proxy = module("frp_lib", "lib/Proxy")
+
+API = Tunnel.getInterface("API")
+
 local ParticleViewer = {}
 ---@type number
 ParticleViewer.ParticleHandle = nil
@@ -33,7 +38,7 @@ function ParticleViewer:Play()
         Citizen.Wait(10)
     end
 
-    UseParticleFxAssetNextCall(self.Data.Dictionary)
+    UseParticleFxAsset(self.Data.Dictionary)
 
     if not DoesParticleFxLoopedExist(self.ParticleHandle) then
         self.ParticleHandle = StartParticleFxLoopedOnEntity(
@@ -63,10 +68,8 @@ function ParticleViewer:SetPlayingState(state)
 
     if self.isPlaying then
         self:Play()
-        DisableIdleCamera(true)
     else
         self:Stop()
-        DisableIdleCamera(false)
     end
 end
 
@@ -112,8 +115,6 @@ function ParticleViewer:Close()
 end
 
 function ParticleViewer:onOpened()
-    InvalidateIdleCam()
-    InvalidateVehicleIdleCam()
     SetNuiFocus(true, true)
 end
 
@@ -163,12 +164,25 @@ RegisterNUICallback("SET_CURSOR_STATE", function(data, cb)
     end
     cb({})
 end)
+
 RegisterCommand("pv_open", function()
+    print(" pv_open ", 1)
+    if not API.IsPlayerAceAllowedGroup(GetPlayerServerId(PlayerId()), "admin") then
+        return
+    end
+    print(" pv_open ", 2)
+
     ParticleViewer:Open()
 end)
+
 RegisterCommand("pv_close", function()
+    if not API.IsPlayerAceAllowedGroup(GetPlayerServerId(PlayerId()), "admin") then
+        return
+    end
+
     ParticleViewer:Close()
 end)
+
 exports("Open", function()
     ParticleViewer:Open()
 end)
